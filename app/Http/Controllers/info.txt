@@ -1,0 +1,17 @@
+public function restore(int $id): ClientResource
+{
+    $client = Client::withTrashed()
+        ->findOrFail($id);
+
+    DB::transaction(function () use ($client) {
+        $client->restore();
+        $client->user()->withTrashed()->restore();
+    });
+
+    $client->load([
+        'user',
+        'city.region',
+    ]);
+
+    return new ClientResource($client);
+}
