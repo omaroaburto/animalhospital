@@ -1,58 +1,203 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🐾 Animal Hospital API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<div align="justify">
+API RESTful desarrollada en Laravel para la gestión integral de una clínica veterinaria. Permite administrar clientes, mascotas, especies, citas médicas y otros recursos esenciales para el funcionamiento de un hospital animal.
+</div>
 
-## About Laravel
+<div align="justify">
+Este proyecto está diseñado como práctica de arquitectura backend moderna, aplicando buenas prácticas como separación de responsabilidades, uso de relaciones Eloquent, validaciones, control de errores y autenticación basada en roles.
+</div>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Tecnologías utilizadas
+* PHP 8+
+* Laravel
+* MySQL / MariaDB
+* Eloquent ORM
+* REST API
+* Laravel Migrations & Seeders
+* Soft Deletes
+* Enum Types (Roles y otros estados)
+* Postman (testing)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Características principales
+* Gestión de clientes y usuarios relacionados
+* Registro y administración de mascotas
+* Catálogo de especies y razas
+* Sistema de roles de usuario (Enum Role)
+* Relación 1 a 1 entre Client y User
+* Eliminación lógica (Soft Deletes)
+* Validaciones centralizadas
+* API estructurada por módulos
+* Manejo de errores estandarizado en JSON
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🧱 Arquitectura del sistema
 
-## Learning Laravel
+El proyecto sigue una arquitectura RESTful con separación por capas:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* Controllers → lógica HTTP
+* Models → lógica de datos
+* Requests → validación
+* Enums → estados y roles
+* Migrations → estructura de base de datos
+* Seeders & Factories → datos de prueba
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📡 Endpoints principales
+### 👤 Usuarios
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **GET** | `/api/users` | Listar usuarios |
+| **GET** | `/api/users/{id}` | Obtener usuario |
+| **POST** | `/api/users` | Crear usuario |
+| **PATCH** | `/api/users/{id}` | Actualizar usuario |
+| **DELETE** | `/api/users/{id}` | Eliminar usuario (soft delete) |
 
-## Agentic Development
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 🧑 Clientes
 
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **GET** | `/api/clients` | Listar clientes |
+| **GET** | `/api/clients/{id}` | Detalle de cliente |
+| **POST** | `/api/clients` | Crear cliente con usuario asociado |
+| **PATCH** | `/api/clients/{id}` | Actualizar cliente |
+| **DELETE** | `/api/clients/{id}` | Eliminar cliente (soft delete) |
+
+
+### 🐶 Mascotas (Pets)
+
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **GET** | `/api/pets` | Listar mascotas |
+| **GET** | `/api/pets/{id}` | Detalle de mascota |
+| **POST** | `/api/pets` | Registrar mascota |
+| **PATCH** | `/api/pets/{id}` | Actualizar mascota |
+| **DELETE** | `/api/pets/{id}` | Eliminar mascota |
+
+### 🧬 Especies
+
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **GET** | `/api/species` | Listar especies |
+| **GET** | `/api/species/{id}` | Listar especies |
+
+
+
+### 🐇 Razas
+
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **GET** | `/api/breeds` | Listar razas |
+| **GET** | `/api/breeds/{id}` | Listar razas |
+| **POST** | `/api/breeds` | Registrar razas |
+| **PATCH** | `/api/breeds/{id}` | Actualizar razas |
+| **DELETE** | `/api/breeds/{id}` | Eliminar razas |
+
+###  👩‍💼 CLiente - 🐱  Mascota
+
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **GET** | `/api/client/{client}/pets` | Listar mascotas de un cliente |
+
+
+## Relaciones del sistema
+* User 1 → 1 Client
+* Client 1 → N Pets
+* Species 1 → N Breeds
+* Breed 1 → N Pets
+* Species 1 → N Pets
+
+## ⚙️ Instalación del proyecto
 ```bash
-composer require laravel/boost --dev
+# 1. Clonar el repositorio
+git clone https://github.com/omaroaburto/animalhospital.git
 
-php artisan boost:install
+# 2. Acceder al directorio
+cd animalhospital
+
+# 3. Instalar dependencias de PHP
+composer install
+
+# 4. Crear archivo de entorno ambiental
+cp .env.example .env
+
+# 5. Generar la clave de aplicación de Laravel
+php artisan key:generate
+
+# 6. Ejecutar migraciones e insertar datos de prueba
+php artisan migrate --seed
+
+# 7. Levantar el servidor local
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## 📁 Estructura del proyecto
 
-## Contributing
+```
+app/
+ ├── Http/
+ │    ├── Controllers/
+ │    ├── Requests/ 
+ │    ├── Resource/ 
+ ├── Models/
+ ├── Enums/
+ ├── Providers/
+database/
+ ├── data/
+ ├── migrations/
+ ├── seeders/
+ ├── factories/
+routes/
+ ├── api.php
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧠 Decisiones de diseño
 
-## Code of Conduct
+* Uso de Soft Deletes para mantener historial de registros eliminados
+* Separación de lógica usando Requests para validación
+* Uso de Enums para roles, mejorando escalabilidad
+* API pensada para consumo por frontend o mobile app
+* Relaciones Eloquent para integridad de datos
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+ 
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🚀 Estado del Proyecto: API en Desarrollo
 
-## License
+> ⚠️ **Nota:** Esta API se encuentra actualmente en fase activa de desarrollo. Las funcionalidades base están siendo construidas y el sistema evolucionará constantemente.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 🛠️ Próximas Funcionalidades (Roadmap)
+
+El núcleo del sistema incorporará herramientas avanzadas de seguridad, autenticación y gestión de archivos:
+
+- 🔒 **Trabajo con JWT**: Implementación de JSON Web Tokens para una autenticación segura y sin estado.
+- 👥 **Gestión de Roles**: Control de acceso basado en roles (RBAC) para proteger rutas y recursos.
+- 🧑‍💻 **Registro de Usuarios**: Sistema completo para que nuevos perfiles se unan a la plataforma.
+- 🔑 **Login & Logout**: Flujos seguros de inicio y cierre de sesión de usuarios.
+- 📧 **Validación de Correo**: Verificación obligatoria de cuentas mediante enlaces por email.
+- 🔄 **Recuperación de Correos**: Sistema de restablecimiento de contraseñas olvidadas de forma segura.
+- 📝 **Creación de Documentos**: Generación y exportación de archivos y reportes del sistema.
+- 🖼️ **Trabajo con Imágenes**: Procesamiento, carga y almacenamiento de archivos multimedia.
+
+---
+
+## 📦 Módulos del Sistema por Implementar
+
+La arquitectura se dividirá en módulos específicos para cubrir las necesidades del negocio y la atención al cliente:
+
+### 🗃️ Módulo de Inventario
+- Control de stock en tiempo real.
+- Registro de productos, proveedores y alertas de almacenamiento bajo.
+
+### 🛍️ Módulo de Ventas
+- Gestión de transacciones y procesamiento de pagos de clientes.
+- Historial de compras y facturación modular.
+
+### 🩺 Módulo de Reserva de Atención Médica Veterinaria
+- **Gestión de Clientes (Dueños)**: Perfiles detallados de las personas asociadas a las cuentas.
+- **🐾 Razas y Animales**: Registro clínico y control de mascotas según su especie y raza (caninos, felinos, etc.).
+- **📅 Agenda Médica**: Sistema de turnos, citas y calendario para el personal veterinario.
+ 
+
