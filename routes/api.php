@@ -25,5 +25,8 @@ Route::apiResource('v1/breeds', BreedController::class);
 Route::apiResource('v1/clients', ClientController::class);
 //lista las mascotas de un cliente
 Route::get('v1/clients/{client}/pets',[ClientPetController::class,'index']);
-//TODO: api mascota
+// api mascota
 Route::apiResource('v1/pets', PetController::class);
+
+//TODO: user
+//Route::post('v1/login')
