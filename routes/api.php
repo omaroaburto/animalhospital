@@ -10,54 +10,63 @@ use App\Http\Controllers\RegionController;
 use App\Http\Controllers\SpeciesController;
 use Illuminate\Support\Facades\Route;
 
-//api regiones
-Route::apiResource('v1/regions', RegionController::class)
-    ->only(['index','show']);
-//api ciudades
-Route::apiResource('v1/cities', CityController::class)
-    ->only(['index','show']);
-//api especies
-Route::apiResource('v1/species', SpeciesController::class)
-    ->only(['index','show']);;
-
-//api razas
-Route::apiResource('v1/breeds', BreedController::class);
-//api clientes
-/*Route::apiResource('v1/clients', ClientController::class)
-    ->only(['store']);
-Route::apiResource('v1/clients', ClientController::class)
-        ->middleware(['jwt.auth'])
-        ->only(['index','update', 'show', 'detroy']);
-Route::apiResource('v1/clients', ClientController::class)
-        ->middleware(['is_admin'])
-        ->only(['index', 'detroy']);
-Route::apiResource('v1/clients', ClientController::class)
-        ->middleware(['is_owner'])
-        ->only(['update', 'show']);*/
-
+//RUTAS SIN JWT
+//Registro de clientes
 Route::post('v1/clients', [ClientController::class, 'store']);
-Route::middleware(['jwt.auth'])->prefix('v1/clients')->group(function () {
+//Login
+Route::post('v1/login',[AuthController::class, 'login']);
+
+//RUTAS CON JWT
+Route::middleware(['jwt.auth'])->prefix('v1/')->group(function () {
+    //api regiones
+    Route::apiResource('regions/', RegionController::class)
+        ->only(['index','show']);
+    //api ciudades
+    Route::apiResource('cities/', CityController::class)
+        ->only(['index','show']);
+    //api especies
+    Route::apiResource('species/', SpeciesController::class)
+        ->only(['index','show']);
+    //razas
+    Route::apiResource('/breeds', BreedController::class)
+        ->only(['index','show']);
+
+    //registrar mascota
+    Route::post('pet/',[PetController::class, 'store']);
 
     // Rutas para Administradores
     Route::middleware(['is_admin'])->group(function () {
-        Route::get('/', [ClientController::class, 'index']);
-        Route::delete('/{client}', [ClientController::class, 'destroy']);
+        //Api pets
+        Route::apiResource('pets/', PetController::class)
+            ->only(['index','show','destroy','update']);
+        //Api razas
+        Route::apiResource('/breeds', BreedController::class)
+            ->only(['destroy','update','store']);
+        //Api clientes
+        Route::get('clients', [ClientController::class, 'index']);
+        Route::delete('clients/{client}', [ClientController::class, 'destroy']);
     });
 
     // Rutas para Dueños del recurso
     Route::middleware(['is_owner'])->group(function () {
-        Route::get('/{client}', [ClientController::class, 'show']);
-        Route::put('/{client}', [ClientController::class, 'update']);
+        //lista las mascotas de un cliente
+        Route::get('clients/{client}/pets',[ClientPetController::class,'index']);
+        //buscar mascota del cliente por su id o nombre
+        //Route::get('clients/{client}/pets/{pet}',[ClientPetController::class,'index']);
+        Route::get('clients/{client}/pets/{pet}',[ClientPetController::class, 'show'])->scopeBindings();
+        //actualizar mascota de un cliente por el id la mascota
+        Route::patch('clients/{client}/pets/{pet}',[ClientPetController::class,'patch'])->scopeBindings();
+        //eliminar mascota
+        Route::delete('clients/{client}/pets/{pet}',[ClientPetController::class,'destroy'])->scopeBindings();
+        //mostar información del cliente
+        Route::get('clients/{client}', [ClientController::class, 'show']);
+        //actualizar información del cliente
+        Route::put('clients/{client}', [ClientController::class, 'update']);
     });
+
+    //USUARIOS
+    //cerrar sesión
+    Route::post('logout/',[AuthController::class, 'logout']);
+    //refrescar token
+    Route::post('refresh/',[AuthController::class, 'refresh']);
 });
-
-
-//lista las mascotas de un cliente
-Route::get('v1/clients/{client}/pets',[ClientPetController::class,'index']);
-// api mascota
-Route::apiResource('v1/pets', PetController::class);
-
-//TODO: user
-Route::post('v1/login',[AuthController::class, 'login']);
-Route::post('v1/logout',[AuthController::class, 'logout']);
-Route::post('v1/refresh',[AuthController::class, 'refresh']);
