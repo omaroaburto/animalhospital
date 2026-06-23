@@ -2,11 +2,15 @@
 
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\VerifyOwnership;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -40,4 +44,29 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // Manejar excepciones de JWT
+        $exceptions->render(function (UnauthorizedHttpException $e, Request $request) {
+                if ($request->is('api/*')) {
+                    $previous = $e->getPrevious();
+                // Mensaje personalizado para Token Expirado
+                    if ($previous instanceof TokenExpiredException) {
+                        return response()->json([
+                            'status' => 'error',
+                            'error_code' => 'JWT_TOKEN_EXPIRED',
+                            'message' => 'El token ha expirado. Por favor, solicita uno nuevo.'
+                        ], 401);
+                    }
+                    // Otros errores de JWT (Inválido, etc.)
+                    if ($previous instanceof TokenInvalidException) {
+                        return response()->json(['error' => 'Token inválido'], 401);
+                    }
+                }
+        });
+
+         // Manejar cuando no se envía token
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['error' => 'No autenticado'], 401);
+            }
+        });
     })->create();
