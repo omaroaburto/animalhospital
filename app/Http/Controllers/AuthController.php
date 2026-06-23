@@ -80,22 +80,38 @@ class AuthController extends Controller
     public function refresh(): JsonResponse
     {
         try {
-            // JWTAuth::refresh() hace todo el trabajo: lee, invalida el viejo y crea el nuevo
-            $newToken = JWTAuth::refresh();
+            // 1. Forzamos a JWTAuth a obtener el token desde la petición actual de forma explícita
+            $token = JWTAuth::getToken();
 
-            // Retornas usando tu método auxiliar pasándole el nuevo token
+            if (!$token) {
+                return response()->json([
+                    'error' => 'No se proporcionó ningún token en las cabeceras de la petición.'
+                ], Response::HTTP_BAD_REQUEST); // Error 400
+            }
+
+            // 2. Intentamos refrescar el token capturado
+            $newToken = JWTAuth::refresh($token);
+
+            // 3. Retornamos el nuevo token generado
             return $this->respondWithToken($newToken);
 
         } catch (TokenBlacklistedException $e) {
-            // El cliente intentó refrescar un token que ya había sido usado para refrescar antes
             return response()->json([
-                'error' => 'Este token ya fue invalidado o utilizado previamente.'
+                'error' => 'Este token ya se encuentra en la lista negra (ya fue utilizado o invalidado antes).'
+            ], Response::HTTP_UNAUTHORIZED); // Error 401
+
+        } catch (TokenExpiredException $e) {
+            // Si el token expiró su tiempo normal (TTL), ¡aquí es donde se debería refrescar con éxito!
+            // Pero si salta esta excepción en el catch, significa que el REFRESH_TTL (el tiempo máximo total de renovación) también caducó.
+            return response()->json([
+                'error' => 'El periodo máximo de renovación (Refresh TTL) ha expirado. Debes iniciar sesión de nuevo.',
+                'detalle' => $e->getMessage()
             ], Response::HTTP_UNAUTHORIZED); // Error 401
 
         } catch (JWTException $e) {
-            // Captura si el token está mal formado o si ya expiró el "Refresh Time-To-Live"
             return response()->json([
-                'error' => 'No se pudo refrescar el token. El periodo de renovación ha expirado o el token es inválido.'
+                'error' => 'Error al procesar el token. Puede estar mal estructurado, alterado o inválido.',
+                'detalle' => $e->getMessage() // Esto nos dirá el mensaje real del error interno
             ], Response::HTTP_UNAUTHORIZED); // Error 401
         }
     }

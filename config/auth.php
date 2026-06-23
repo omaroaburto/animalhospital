@@ -44,6 +44,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'api' => [
+            'driver' => 'jwt', // Aquí le indicamos a Laravel que use JWT
+            'provider' => 'users',
+        ],
     ],
 
     /*

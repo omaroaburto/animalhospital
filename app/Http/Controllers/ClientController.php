@@ -60,7 +60,7 @@ class ClientController extends Controller
     public function show(Client $client): ClientResource
     {
         //retorna cliente, con su ciudad, region, mascotas con su raza y especie.
-        $client->load(['city.region']);
+        $client->load(['city.region','user']);
         return new ClientResource($client);
     }
 
