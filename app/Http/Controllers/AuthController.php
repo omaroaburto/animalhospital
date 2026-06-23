@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Models\User;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 //use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -124,5 +127,27 @@ class AuthController extends Controller
             // Obtenemos el tiempo de vida en segundos multiplicando los minutos por 60
             'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+        ]);
+
+        $user = User::where('verification_token', $request->token)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Token inválido o expirado'
+            ], 404);
+        }
+
+        $user->update([
+            'email_verified_at' => now(),
+            'verification_token' => null,
+        ]);
+
+        return view('emails.verified', compact('user'));
     }
 }

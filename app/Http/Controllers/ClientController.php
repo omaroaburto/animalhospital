@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\DB;
 
 class ClientController extends Controller
@@ -30,7 +31,7 @@ class ClientController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientRequest $request): ClientResource
+    public function store(StoreClientRequest $request): JsonResponse
     {
 
         // Ejecuta el proceso dentro de una transacción para asegurar la integridad de los datos
@@ -48,10 +49,21 @@ class ClientController extends Controller
             // Crea el perfil del cliente asociado al usuario recién creado y lo retorna
             return $user->client()->create($data);
         });
+        // generar token de verificación
+        $token = $client->user->generateVerificationToken();
+
+        // enviar correo
+        $client->user->notify(new VerifyEmailNotification($token));
         //Carga de forma diferida (Eager Loading) las relaciones necesarias para evitar consultas extra
         $client->load(['city.region','user']);
         // Transforma el modelo en una respuesta JSON estructurada para la API
-        return new ClientResource($client);
+        return (new ClientResource($client))
+        ->additional([
+            'status' => 'success',
+            'message' => 'Cliente registrado con éxito. Por favor, verifica tu correo electrónico.'
+        ])
+        ->response()
+        ->setStatusCode(201);
     }
 
     /**
