@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Route;
 Route::post('v1/clients', [ClientController::class, 'store']);
 //Login
 Route::post('v1/login',[AuthController::class, 'login']);
+//Verificación de email (API)
+Route::get('v1/email/verify', [AuthController::class, 'verifyEmail']);
 
-//RUTAS CON JWT
-Route::middleware(['jwt.auth'])->prefix('v1/')->group(function () {
+//RUTAS CON JWT Y CUENTAS VERIFICADAS (email)
+Route::middleware(['jwt.auth', 'verified'])->prefix('v1/')->group(function () {
     //api regiones
     Route::apiResource('regions/', RegionController::class)
         ->only(['index','show']);
@@ -65,6 +67,7 @@ Route::middleware(['jwt.auth'])->prefix('v1/')->group(function () {
     });
 
     //USUARIOS
+
     //cerrar sesión
     Route::post('logout/',[AuthController::class, 'logout']);
     //refrescar token
