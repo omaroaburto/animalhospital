@@ -36,35 +36,38 @@ Route::middleware(['jwt.auth', 'verified'])->prefix('v1/')->group(function () {
     //registrar mascota
     Route::post('pet/',[PetController::class, 'store']);
 
-    // Rutas para Administradores
-    Route::middleware(['is_admin'])->group(function () {
-        //Api pets
-        Route::apiResource('pets/', PetController::class)
-            ->only(['index','show','destroy','update']);
-        //Api razas
-        Route::apiResource('/breeds', BreedController::class)
-            ->only(['destroy','update','store']);
-        //Api clientes
-        Route::get('clients', [ClientController::class, 'index']);
-        Route::delete('clients/{client}', [ClientController::class, 'destroy']);
-    });
+    /*******************************************
+     ***      Rutas para Administradores     ***
+     *******************************************/
+    //Api pets
+    Route::apiResource('pets/', PetController::class)
+        ->only(['index','show','destroy','update']);
+    //Api razas
+    Route::apiResource('/breeds', BreedController::class)
+        ->only(['destroy','update','store']);
+    //Api clientes
+    Route::get('clients', [ClientController::class, 'index']);
+    Route::delete('clients/{client}', [ClientController::class, 'destroy']);
 
-    // Rutas para Dueños del recurso
-    Route::middleware(['is_owner'])->group(function () {
-        //lista las mascotas de un cliente
-        Route::get('clients/{client}/pets',[ClientPetController::class,'index']);
-        //buscar mascota del cliente por su id o nombre
-        //Route::get('clients/{client}/pets/{pet}',[ClientPetController::class,'index']);
-        Route::get('clients/{client}/pets/{pet}',[ClientPetController::class, 'show'])->scopeBindings();
-        //actualizar mascota de un cliente por el id la mascota
-        Route::patch('clients/{client}/pets/{pet}',[ClientPetController::class,'patch'])->scopeBindings();
-        //eliminar mascota
-        Route::delete('clients/{client}/pets/{pet}',[ClientPetController::class,'destroy'])->scopeBindings();
-        //mostar información del cliente
-        Route::get('clients/{client}', [ClientController::class, 'show']);
-        //actualizar información del cliente
-        Route::put('clients/{client}', [ClientController::class, 'update']);
-    });
+    /***********************************************
+     ***      Rutas para Dueños del recurso      ***
+     ***********************************************/
+    //crear
+    Route::post('clients/{client}/pets',[ClientPetController::class,'store']);
+    //lista las mascotas de un cliente
+    Route::get('clients/{client}/pets',[ClientPetController::class,'index']);
+    //buscar mascota del cliente por su id o nombre
+    //Route::get('clients/{client}/pets/{pet}',[ClientPetController::class,'index']);
+    Route::get('clients/{client}/pets/{pet}',[ClientPetController::class, 'show'])->scopeBindings();
+    //actualizar mascota de un cliente por el id la mascota
+    Route::patch('clients/{client}/pets/{pet}',[ClientPetController::class,'patch'])->scopeBindings();
+    //eliminar mascota
+    Route::delete('clients/{client}/pets/{pet}',[ClientPetController::class,'destroy'])->scopeBindings();
+    //mostar información del cliente
+    Route::get('clients/{client}', [ClientController::class, 'show']);
+    //actualizar información del cliente
+    Route::put('clients/{client}', [ClientController::class, 'update']);
+
 
     //USUARIOS
 
