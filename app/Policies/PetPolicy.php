@@ -10,6 +10,14 @@ use Illuminate\Auth\Access\Response;
 
 class PetPolicy
 {
+
+    public function create(User $user, Client $client): Response
+    {
+        // Solo el Admin o el propio usuario dueño de ese perfil de cliente pueden crearle mascotas
+        return $user->role === Role::ADMIN || $user->id === $client->user_id
+            ? Response::allow()
+            : Response::deny('No tienes permisos para registrar mascotas a este cliente.');
+    }
     /**
      * Determina si el usuario puede listar las mascotas de un cliente específico.
      * Reemplaza/actúa como el viewAny en el contexto de ClientPetController.
@@ -53,4 +61,12 @@ class PetPolicy
             ? Response::allow()
             : Response::deny('No tienes permisos para ver el listado de mascotas.');
     }
+
+    public function manageFromAdmin(User $user): Response
+    {
+        return $user->role === Role::ADMIN
+            ? Response::allow()
+            : Response::deny('Necesitas roles de administrador para acceder a estás funcionalidades d administración de las mascotas.');
+    }
+
 }
