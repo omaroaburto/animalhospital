@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ClientController extends Controller
 {
@@ -22,6 +23,10 @@ class ClientController extends Controller
      */
     public function index(Request $request): ClientCollection
     {
+        //autorizar
+        Gate::authorize('viewAny', Client::class);
+
+        //listar
         $perPage = $request->query('per_page',10);
         //lista los clientes y pagina el resultado
         $clients = Client::with(['city.region', 'user'])->paginate($perPage);
@@ -71,6 +76,9 @@ class ClientController extends Controller
      */
     public function show(Client $client): ClientResource
     {
+        //actorizar
+        Gate::authorize('view',$client);
+
         //retorna cliente, con su ciudad, region, mascotas con su raza y especie.
         $client->load(['city.region','user']);
         return new ClientResource($client);
@@ -81,7 +89,10 @@ class ClientController extends Controller
      */
     public function update(UpdateClientRequest $request, Client $client): ClientResource
     {
+        //autorizar
+        Gate::authorize('update',$client);
 
+        //Actualizar client
         $client = DB::transaction(function () use ($request, $client){
             //se obtienen los datos que pasaron las validaciones
             $data = $request->validated();
@@ -126,6 +137,10 @@ class ClientController extends Controller
      */
     public function destroy(Client $client): JsonResponse
     {
+        //autorización
+        Gate::authorize('delete', $client);
+
+        //Eliminar client
         DB::transaction(function () use ($client){
             $client->delete();
             $client->user()->delete();

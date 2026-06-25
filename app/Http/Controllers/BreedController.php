@@ -9,6 +9,7 @@ use App\Http\Resources\BreedResource;
 use App\Models\Breed;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class BreedController extends Controller
 {
@@ -26,6 +27,8 @@ class BreedController extends Controller
      */
     public function store(StoreBreedRequest $request): BreedResource | JsonResponse
     {
+        Gate::authorize('create', Breed::class);
+
         // 1. Crear el registro con los datos ya validados
         $breed = Breed::create($request->validated());
 
@@ -50,6 +53,8 @@ class BreedController extends Controller
      */
     public function update(UpdateBreedRequest $request, Breed $breed): BreedResource | JsonResponse
     {
+        Gate::authorize('update', Breed::class);
+
         // 1. Actualizar el registro con los datos validados
         $breed->update($request->validated());
 
@@ -65,6 +70,8 @@ class BreedController extends Controller
      */
     public function destroy(Breed $breed): JsonResponse
     {
+        Gate::authorize('delete', Breed::class);
+
         // 1. Eliminar de la base de datos
         $breed->delete();
 

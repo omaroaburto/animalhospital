@@ -9,6 +9,7 @@ use App\Http\Resources\PetResource;
 use App\Models\Pet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class PetController extends Controller
@@ -18,6 +19,7 @@ class PetController extends Controller
      */
     public function index(Request $request): PetCollection
     {
+        Gate::authorize('viewAny',Pet::class);
         $perPage = $request->query('per_page', 10);
         $pets = Pet::with(['breed.species', 'client'])->paginate($perPage);
         return new PetCollection($pets);
@@ -28,6 +30,7 @@ class PetController extends Controller
      */
     public function store(StorePetRequest $request): PetResource
     {
+        Gate::authorize('manageFromAdmin',Pet::class);
         $pet = Pet::create($request->validated());
         $pet->load(['breed.species','client']);
         return new PetResource($pet);
@@ -38,6 +41,7 @@ class PetController extends Controller
      */
     public function show(Pet $pet): PetResource
     {
+        Gate::authorize('viewAny',Pet::class);
         $pet->load(['breed.species','client']);
         return new PetResource($pet);
     }
@@ -47,6 +51,7 @@ class PetController extends Controller
      */
     public function update(UpdatePetRequest $request ,Pet $pet): PetResource
     {
+        Gate::authorize('manageFromAdmin',$pet);
         $pet->update($request->validated());
         $pet->load(['breed.species', 'client']);
         return new PetResource($pet);
@@ -57,6 +62,7 @@ class PetController extends Controller
      */
     public function destroy(Pet $pet): JsonResponse
     {
+        Gate::authorize('manageFromAdmin',$pet);
         $pet->delete();
         return response()->json([
             'status'  => 'success',
