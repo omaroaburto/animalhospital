@@ -22,6 +22,7 @@ class ClientPetController extends Controller
     }
     public function show(Client $client, Pet $pet): PetResource
     {
+        Gate::authorize('manageFromClient',[$pet, $client]);
         $pet->load(['breed.species', 'client.user']);
         return new PetResource($pet);
     }

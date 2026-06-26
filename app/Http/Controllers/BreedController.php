@@ -53,7 +53,7 @@ class BreedController extends Controller
      */
     public function update(UpdateBreedRequest $request, Breed $breed): BreedResource | JsonResponse
     {
-        Gate::authorize('update', Breed::class);
+        Gate::authorize('update', $breed);
 
         // 1. Actualizar el registro con los datos validados
         $breed->update($request->validated());
@@ -70,7 +70,7 @@ class BreedController extends Controller
      */
     public function destroy(Breed $breed): JsonResponse
     {
-        Gate::authorize('delete', Breed::class);
+        Gate::authorize('delete', $breed);
 
         // 1. Eliminar de la base de datos
         $breed->delete();

@@ -13,8 +13,10 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ClientController extends Controller
 {
@@ -38,7 +40,6 @@ class ClientController extends Controller
      */
     public function store(StoreClientRequest $request): JsonResponse
     {
-
         // Ejecuta el proceso dentro de una transacción para asegurar la integridad de los datos
         $client = DB::transaction(function () use ($request){
             // Obtiene únicamente los datos que pasaron las reglas de validación

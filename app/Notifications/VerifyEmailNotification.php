@@ -4,8 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
-use App\Models\Client;
+use Illuminate\Notifications\Messages\MailMessage; 
 
 class VerifyEmailNotification extends Notification
 {
@@ -20,7 +19,7 @@ class VerifyEmailNotification extends Notification
         return ['mail'];
     }
 
-    public function toMail(Client $notifiable): MailMessage
+    public function toMail($notifiable): MailMessage
     {
         $url = config('app.frontend_url') . '?token=' . $this->token;
         /*

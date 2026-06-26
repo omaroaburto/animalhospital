@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\Response;
 class PetPolicy
 {
 
-    public function create(User $user, Client $client): Response
+    public function create(User $user,Pet $pet, Client $client): Response
     {
         // Solo el Admin o el propio usuario dueño de ese perfil de cliente pueden crearle mascotas
         return $user->role === Role::ADMIN || $user->id === $client->user_id
@@ -36,7 +36,7 @@ class PetPolicy
      * Determina si el usuario puede ver, editar o eliminar una mascota bajo el contexto de un cliente.
      * Cubre las acciones: view, update (patch), y delete de ClientPetController.
      */
-    public function manageFromClient(User $user, Client $client, Pet $pet): Response
+    public function manageFromClient(User $user, Pet $pet, Client $client): Response
     {
         // 1. Validamos primero que la mascota realmente pertenezca al cliente de la URL (Defensa en profundidad)
         if ($client->id !== $pet->client_id) {
@@ -66,7 +66,7 @@ class PetPolicy
     {
         return $user->role === Role::ADMIN
             ? Response::allow()
-            : Response::deny('Necesitas roles de administrador para acceder a estás funcionalidades d administración de las mascotas.');
+            : Response::deny('Necesitas roles de administrador para acceder a estás funcionalidades de administración de las mascotas.');
     }
 
 }
